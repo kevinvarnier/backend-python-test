@@ -84,3 +84,10 @@ def todo_delete(id):
     g.db.execute("DELETE FROM todos WHERE id ='%s'" % id)
     g.db.commit()
     return redirect('/todo')
+
+@app.route('/todo/mark/<id>', methods=['POST'])
+def todo_mark_as_complete(id):
+    print(id)
+    g.db.execute("UPDATE todos SET completed = %s WHERE id ='%s'" % (1, id))
+    g.db.commit()
+    return redirect('/todo')
