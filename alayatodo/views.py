@@ -73,6 +73,7 @@ def todos_POST():
             % (session['user']['id'], request.form.get('description'))
         )
         g.db.commit()
+        flash("Todo correctly added")
     else : 
         flash("Please enter a description to add a todo")
     return redirect('/todo')
@@ -84,6 +85,7 @@ def todo_delete(id):
         return redirect('/login')
     g.db.execute("DELETE FROM todos WHERE id ='%s'" % id)
     g.db.commit()
+    flash("Todo correctly deleted")
     return redirect('/todo')
 
 @app.route('/todo/mark/<id>', methods=['POST'])
