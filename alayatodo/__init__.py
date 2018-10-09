@@ -1,4 +1,5 @@
 from flask import Flask, g
+from flask_sqlalchemy import SQLAlchemy
 import sqlite3
 
 # configuration
@@ -7,10 +8,13 @@ DEBUG = True
 SECRET_KEY = 'development key'
 USERNAME = 'admin'
 PASSWORD = 'default'
+SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/alayatodo.db'
 
 
 app = Flask(__name__)
 app.config.from_object(__name__)
+db = SQLAlchemy(app)
+import alayatodo.views
 
 
 def connect_db():
@@ -29,6 +33,3 @@ def teardown_request(exception):
     db = getattr(g, 'db', None)
     if db is not None:
         db.close()
-
-
-import alayatodo.views
