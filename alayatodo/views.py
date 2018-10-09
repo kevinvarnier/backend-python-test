@@ -9,8 +9,7 @@ from flask import (
     jsonify
     )
 from flask_paginate import Pagination, get_page_args
-
-
+from functools import wraps
 
 @app.route('/')
 def home():
@@ -44,8 +43,15 @@ def logout():
     session.pop('user', None)
     return redirect('/')
 
+def login_required(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if not session.get('logged_in'):
+            return redirect('/login')
+    return wrap
 
 @app.route('/todo/<id>', methods=['GET'])
+@login_required
 def todo(id):
     todo =  Todos.query.filter_by(id=id).first()
     return render_template('todo.html', todo=todo)
@@ -53,9 +59,8 @@ def todo(id):
 
 @app.route('/todo', methods=['GET'])
 @app.route('/todo/', methods=['GET'])
+@login_required
 def todos():
-    if not session.get('logged_in'):
-        return redirect('/login')
     page, per_page, offset = get_page_args()
     todo_for_render_template = Todos.query.limit(per_page).offset(offset)
     todo_total = len(Todos.query.all())
@@ -70,9 +75,8 @@ def todos():
 
 @app.route('/todo', methods=['POST'])
 @app.route('/todo/', methods=['POST'])
+@login_required
 def todos_POST():
-    if not session.get('logged_in'):
-        return redirect('/login')
     if request.form.get('description'): 
         description = request.form.get('description')
         todo = Todos(
@@ -88,9 +92,8 @@ def todos_POST():
 
 
 @app.route('/todo/<id>', methods=['POST'])
+@login_required
 def todo_delete(id):
-    if not session.get('logged_in'):
-        return redirect('/login')
     todo_delete = Todos.query.filter_by(id=id).first()
     db.session.delete(todo_delete)
     db.session.commit()
@@ -98,6 +101,7 @@ def todo_delete(id):
     return redirect('/todo')
 
 @app.route('/todo/mark/<id>', methods=['POST'])
+@login_required
 def todo_mark_as_complete(id):
     todo_complete = Todos.query.filter_by(id=id).first()
     todo_complete.completed = 1
@@ -105,6 +109,7 @@ def todo_mark_as_complete(id):
     return redirect('/todo')
 
 @app.route('/todo/<id>/json', methods=['GET'])
+@login_required
 def todo_in_json(id): 
     todo = Todos.query.filter_by(id=id).first()
     todo_json = {
