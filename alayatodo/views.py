@@ -48,12 +48,13 @@ def login_required(f):
     def wrap(*args, **kwargs):
         if not session.get('logged_in'):
             return redirect('/login')
+        return f(*args, **kwargs)    
     return wrap
 
 @app.route('/todo/<id>', methods=['GET'])
 @login_required
 def todo(id):
-    todo =  Todos.query.filter_by(id=id).first()
+    todo =  Todos.query.filter_by(id=id, user_id=session['user']['id']).first()
     return render_template('todo.html', todo=todo)
 
 
@@ -62,12 +63,12 @@ def todo(id):
 @login_required
 def todos():
     page, per_page, offset = get_page_args()
-    todo_for_render_template = Todos.query.limit(per_page).offset(offset)
-    todo_total = len(Todos.query.all())
+    todo_for_render_template = Todos.query.filter_by(user_id=session['user']['id']).limit(per_page).offset(offset)
+    todo_total = (Todos.query.filter_by(user_id=session['user']['id']))
     pagination = Pagination(page=page,
                             per_page=per_page,
                             offset=offset,
-                            total=todo_total,
+                            total=todo_total.count(),
                             css_framework='bootstrap4',
                             record_name='todos')
     return render_template('todos.html', todos=todo_for_render_template, pagination=pagination)
@@ -111,10 +112,13 @@ def todo_mark_as_complete(id):
 @app.route('/todo/<id>/json', methods=['GET'])
 @login_required
 def todo_in_json(id): 
-    todo = Todos.query.filter_by(id=id).first()
-    todo_json = {
-    "id" : todo.id, 
-    "user_id" : todo.user_id,
-    "description" : todo.description
-    }
-    return jsonify(todo_json)
+    todo = Todos.query.filter_by(id=id, user_id=session['user']['id']).first()
+    if todo:
+        todo_json = {
+        "id" : todo.id, 
+        "user_id" : todo.user_id,
+        "description" : todo.description
+        }
+        return jsonify(todo_json)
+    else:
+        return "no data"
