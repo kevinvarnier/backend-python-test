@@ -9,6 +9,7 @@ SECRET_KEY = 'development key'
 USERNAME = 'admin'
 PASSWORD = 'default'
 SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/alayatodo.db'
+PER_PAGE = 5
 
 
 app = Flask(__name__)
