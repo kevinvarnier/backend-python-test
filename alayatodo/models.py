@@ -1,4 +1,5 @@
 from alayatodo import db
+import bcrypt
 
 class Users(db.Model): 
     """
@@ -8,6 +9,11 @@ class Users(db.Model):
     username = db.Column(db.String(255), unique=True, nullable=False)
     password = db.Column(db.String(255), unique=True, nullable=False)
 
+    def check_password(self, password): 
+        print(self.password, password)
+        if bcrypt.checkpw(password.encode('utf-8'), self.password.encode('utf-8')):
+            return True 
+            
 class Todos(db.Model): 
     """
     Todo model

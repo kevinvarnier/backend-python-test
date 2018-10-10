@@ -28,8 +28,8 @@ def login_POST():
     username = request.form.get('username')
     password = request.form.get('password')
 
-    user = Users.query.filter_by(username= username, password=password).first()
-    if user:
+    user = Users.query.filter_by(username= username).first()
+    if user and user.check_password(password):
         session['user'] = {'username': user.username, 'id': user.id}
         session['logged_in'] = True
         return redirect('/todo')

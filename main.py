@@ -10,7 +10,7 @@ import subprocess
 import os
 
 from alayatodo import app
-
+from resources import fixtures
 
 def _run_sql(filename):
     try:
@@ -29,6 +29,7 @@ if __name__ == '__main__':
     if args['initdb']:
         _run_sql('resources/database.sql')
         _run_sql('resources/fixtures.sql')
+        fixtures.create_users()
         print "AlayaTodo: Database initialized."
     elif args['migratedb']:
         _run_sql('resources/migration.sql')
