@@ -10,7 +10,6 @@ class Users(db.Model):
     password = db.Column(db.String(255), unique=True, nullable=False)
 
     def check_password(self, password): 
-        print(self.password, password)
         if bcrypt.checkpw(password.encode('utf-8'), self.password.encode('utf-8')):
             return True 
             
